@@ -87,7 +87,7 @@ public class WhAsm {
         commands.put(cmd, new Command(cmd, "\t\t\t"));
 
         // flow control
-        cmd = "mark";
+        cmd = "mark"; // see pseudo commands
         commands.put(cmd, new Command(cmd, "\n  ", true));
         cmd = "call";
         commands.put(cmd, new Command(cmd, "\n \t", true));
@@ -144,6 +144,45 @@ public class WhAsm {
             }
         });
 
+        // marks the programm with a label 
+        cmd = "marks";
+        commands.put(cmd, new Command(cmd, "") {
+            void output(String param) {
+                commands.get("mark").output(labelToBinary(param));
+            }
+        });
+
+
+        // jumps to the given label (label is a string)
+        cmd = "jumps";
+        commands.put(cmd, new Command(cmd, "") {
+            void output(String param) {
+                commands.get("jump").output(labelToBinary(param));
+            }
+        });
+
+        cmd = "branchzs";
+        commands.put(cmd, new Command(cmd, "") {
+            void output(String param) {
+                commands.get("branchz").output(labelToBinary(param));
+            }
+        });
+
+        cmd = "branchltzs";
+        commands.put(cmd, new Command(cmd, "") {
+            void output(String param) {
+                commands.get("branchltz").output(labelToBinary(param));
+            }
+        });
+
+    }
+
+    private static String labelToBinary(String label) {
+        String mark = "0b";
+        for (char c : label.toCharArray()) {
+            mark += Integer.toString((int)c,2);
+        }
+        return mark;
     }
 
 }
@@ -168,27 +207,28 @@ class Command {
         System.out.print(this.cmd);
        
         param = param.trim();
-        int p;
         if (this.param) {
             // binary
             if (param.startsWith("0b"))
-                p = Integer.parseInt(param.replace("0b",""), 2);
+                System.out.println(param.replace('0',' ').replace('1','\t'));
             // hex
             else if (param.startsWith("0x"))
-                p = Integer.parseInt(param.replace("0x",""), 16);
+                output0(Integer.parseInt(param.replace("0x",""), 16));
             // decimal
             else 
-                p = Integer.parseInt(param);
-
-            if (p<0) System.out.print('\t');
-            else System.out.print(' ');
-            System.out.println(
-                    Integer.toString(p,2)
-                        .replace("-","")
-                        .replace('0',' ')
-                        .replace('1','\t'));
+                output0(Integer.parseInt(param));
         }
-            
+    }
+
+    private void output0(int p) {
+        if (p<0) System.out.print('\t');
+        else System.out.print(' ');
+        System.out.println(
+                Integer.toString(p,2)
+                .replace("-","")
+                .replace('0',' ')
+                .replace('1','\t'));
+
     }
 
     public boolean equals(Object o) {
