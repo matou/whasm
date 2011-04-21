@@ -157,6 +157,13 @@ public class WhAsm {
             }
         });
 
+        cmd = "calls";
+        commands.put(cmd, new Command(cmd, "") {
+            void output(String param) {
+                commands.get("call").output(labelToBinary(param));
+            }
+        });
+
         cmd = "branchzs";
         commands.put(cmd, new Command(cmd, "") {
             void output(String param) {
