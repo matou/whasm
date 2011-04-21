@@ -35,6 +35,7 @@ public class WhAsm {
 
             // get rid of comments
             line = line.split(comment)[0].trim();
+            if (line.equals("")) continue;
 
             command = line.split("\\s+")[0];
             param = "";
@@ -42,12 +43,7 @@ public class WhAsm {
                 for (int i=1; i<line.split("\\s+").length; i++)
                     param += line.split("\\s+")[i] + " ";
 
-            try {
-                commands.get(command).output(param);
-            } catch (NullPointerException n) {
-                n.printStackTrace();
-                System.err.println(command);
-            }
+            commands.get(command).output(param);
         }
     }
 
@@ -210,7 +206,11 @@ class Command {
         if (this.param) {
             // binary
             if (param.startsWith("0b"))
-                System.out.println(param.replace('0',' ').replace('1','\t'));
+                System.out.println( 
+                        param
+                        .replace("0b","")
+                        .replace('0',' ')
+                        .replace('1','\t'));
             // hex
             else if (param.startsWith("0x"))
                 output0(Integer.parseInt(param.replace("0x",""), 16));
